@@ -10,7 +10,7 @@ const Login = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', { 
+      const response = await fetch('/api/auth/login', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,6 +25,9 @@ const Login = () => {
       const data = await response.json();
       console.log('Login successful, token:', data.token);
       
+      // Save the token and redirect to dashboard
+      localStorage.setItem('token', data.token);
+      window.location.href = '/dashboard';
     } catch (err) {
       setError(err.message);
     }
