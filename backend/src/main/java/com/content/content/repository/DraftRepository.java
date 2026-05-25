@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface DraftRepository extends JpaRepository<Draft, UUID> {
 
-    List<Draft> findByContentIdOrderByVersionDesc(UUID contentId);
+    List<Draft> findByContent_IdOrderByVersionDesc(UUID contentId);
 
     @Query("SELECT COALESCE(MAX(d.version), 0) FROM Draft d WHERE d.content.id = :contentId")
     int findMaxVersionByContentId(@Param("contentId") UUID contentId);

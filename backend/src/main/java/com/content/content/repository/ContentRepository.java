@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ContentRepository extends JpaRepository<Content, UUID> {
-    List<Content> findByTeamId(UUID teamId);
+    List<Content> findByTeam_Id(UUID teamId);
     List<Content> findByStatus(String status);
 }
