@@ -1,98 +1,94 @@
 import React, { useState } from 'react';
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    
+    setError(''); setSuccess(''); setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', { 
+      const res = await fetch('http://localhost:8080/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
-
-      if (!response.ok) {
-        throw new Error('Registration failed. Email might already exist.');
-      }
-
-      const data = await response.text();
-      setSuccess(data || 'User registered successfully');
-      
-      setName('');
-      setEmail('');
-      setPassword('');
-      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      setSuccess('Account created! Redirecting...');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
+      setTimeout(() => window.location.href = '/dashboard', 1200);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-[#203a43] to-[#2c5364] p-5 font-sans text-white">
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:-translate-y-1 transition-transform duration-300">
-        <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">Create an Account</h2>
-        <p className="text-center text-white/70 mb-8 text-sm">Join us to get started</p>
-        
-        {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg text-sm mb-5 text-center">{error}</div>}
-        {success && <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-3 rounded-lg text-sm mb-5 text-center">{success}</div>}
-        
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="name" className="text-sm font-medium text-white/90 tracking-wide">Name</label>
-            <input 
-              type="text" 
-              id="name" 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              placeholder="Enter your full name"
-              className="p-3 rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-cyan-400 focus:bg-black/40 focus:ring-4 focus:ring-cyan-400/10 transition-all placeholder-white/30"
-              required 
-            />
-          </div>
+    <div className="min-h-screen bg-[#080c14] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-[-20%] left-[-10%] w-150 h-150 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-125 h-125 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-75 h-75 bg-violet-500/5 rounded-full blur-[80px] pointer-events-none" />
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="text-sm font-medium text-white/90 tracking-wide">Email</label>
-            <input 
-              type="email" 
-              id="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              placeholder="Enter your email"
-              className="p-3 rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-cyan-400 focus:bg-black/40 focus:ring-4 focus:ring-cyan-400/10 transition-all placeholder-white/30"
-              required 
-            />
-          </div>
-          
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-sm font-medium text-white/90 tracking-wide">Password</label>
-            <input 
-              type="password" 
-              id="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              placeholder="Create a password"
-              className="p-3 rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-cyan-400 focus:bg-black/40 focus:ring-4 focus:ring-cyan-400/10 transition-all placeholder-white/30"
-              required 
-            />
-          </div>
-          
-          <button type="submit" className="mt-2 p-4 rounded-xl font-semibold text-slate-900 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(34,211,238,0.4)] active:translate-y-0 transition-all">
-            Register
-          </button>
-        </form>
-        
-        <div className="text-center mt-6 text-sm text-white/60">
-          Already have an account? <a href="/login" className="text-cyan-400 font-semibold hover:text-emerald-400 transition-colors">Log in</a>
+      <div className="w-full max-w-md relative z-10">
+        <div className="text-center mb-8">
+          <span className="text-3xl font-black bg-linear-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent tracking-tight">
+            CreatorOS
+          </span>
+          <p className="text-slate-500 text-sm mt-1">The platform built for creators</p>
+        </div>
+
+        <div className="bg-white/3 border border-white/8 rounded-2xl p-8 shadow-[0_0_60px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+          <h2 className="text-2xl font-bold text-white mb-1">Create your account</h2>
+          <p className="text-slate-500 text-sm mb-7">Start managing your content like a pro</p>
+
+          {error && (
+            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm mb-5">
+              <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm mb-5">
+              <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+              {success}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {[
+              { label: 'Full Name', name: 'name', type: 'text', placeholder: 'John Creator' },
+              { label: 'Email Address', name: 'email', type: 'email', placeholder: 'john@example.com' },
+              { label: 'Password', name: 'password', type: 'password', placeholder: '••••••••' },
+            ].map(({ label, name, type, placeholder }) => (
+              <div key={name}>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{label}</label>
+                <input
+                  type={type} name={name} value={form[name]}
+                  onChange={handleChange} placeholder={placeholder} required
+                  className="w-full bg-white/4 border border-white/8 text-white placeholder-slate-600 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500/60 focus:bg-white/6 focus:ring-2 focus:ring-cyan-500/10 transition-all"
+                />
+              </div>
+            ))}
+
+            <button
+              type="submit" disabled={loading}
+              className="w-full mt-2 py-3.5 rounded-xl font-semibold text-sm text-slate-900 bg-linear-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(34,211,238,0.25)] hover:shadow-[0_0_30px_rgba(34,211,238,0.4)] active:scale-[0.98]"
+            >
+              {loading ? 'Creating account...' : 'Create Account →'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-slate-600 mt-6">
+            Already have an account?{' '}
+            <a href="/login" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">Sign in</a>
+          </p>
         </div>
       </div>
     </div>
