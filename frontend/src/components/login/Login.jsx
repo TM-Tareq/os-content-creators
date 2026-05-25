@@ -25,8 +25,9 @@ const Login = () => {
       const data = await response.json();
       console.log('Login successful, token:', data.token);
       
-      // Save the token and redirect to dashboard
+      // Save the token and userId, then redirect to dashboard
       localStorage.setItem('token', data.token);
+      localStorage.setItem('userId', data.userId);
       window.location.href = '/dashboard';
     } catch (err) {
       setError(err.message);
