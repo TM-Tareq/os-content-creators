@@ -108,7 +108,7 @@ CREATE TABLE analytics (
     collected_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Helpful indexes for the queries you'll actually run
+-- Helpful indexes for the queries actually run
 CREATE INDEX idx_content_team    ON content(team_id);
 CREATE INDEX idx_content_status  ON content(status);
 CREATE INDEX idx_variant_content ON platform_variant(content_id);
